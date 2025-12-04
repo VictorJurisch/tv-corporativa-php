@@ -197,6 +197,29 @@ function createMedia(Database $db, array $data): void {
         jsonError('Conteúdo Base64 inválido');
     }
     
+    // Valida conteúdo decodificado como imagem válida
+    $decodedContent = base64_decode($base64Content, true);
+    if ($decodedContent === false) {
+        jsonError('Falha ao decodificar Base64');
+    }
+    
+    // Verifica tamanho máximo (10MB)
+    if (strlen($decodedContent) > UPLOAD_MAX_SIZE) {
+        jsonError('Arquivo excede o tamanho máximo permitido (10MB)');
+    }
+    
+    // Valida se é uma imagem válida usando getimagesizefromstring
+    $imageInfo = @getimagesizefromstring($decodedContent);
+    if ($imageInfo === false) {
+        jsonError('O arquivo não é uma imagem válida');
+    }
+    
+    // Verifica se o MIME type da imagem corresponde ao declarado
+    $actualMimeType = $imageInfo['mime'] ?? '';
+    if (!isValidImageMimeType($actualMimeType)) {
+        jsonError('Tipo de imagem não permitido');
+    }
+    
     $title = trim($data['title']);
     $description = trim($data['description']);
     $authorName = trim($data['author_name'] ?? 'Sistema');
@@ -232,8 +255,7 @@ function createMedia(Database $db, array $data): void {
         // Gera nome único para o arquivo
         $fileName = generateUniqueFileName($image['fileName']);
         
-        // Calcula tamanho em bytes
-        $decodedContent = base64_decode($base64Content);
+        // Usa o tamanho já calculado durante validação
         $fileSize = strlen($decodedContent);
         
         // Insere o anexo

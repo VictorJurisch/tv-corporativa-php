@@ -23,13 +23,37 @@ define('UPLOAD_ALLOWED_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'image/w
 // Configuração de timezone
 date_default_timezone_set(APP_TIMEZONE);
 
-// Configurações de erro (desativar em produção)
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
+// Ambiente (production ou development)
+define('APP_ENV', getenv('APP_ENV') ?: 'production');
+
+// Configurações de erro baseadas no ambiente
+if (APP_ENV === 'development') {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+} else {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 0);
+    ini_set('log_errors', 1);
+}
+
+// Domínios permitidos para CORS (configure conforme necessário)
+define('CORS_ALLOWED_ORIGINS', getenv('CORS_ORIGINS') ?: '*');
 
 // Headers CORS para API
 function setCorsHeaders() {
-    header('Access-Control-Allow-Origin: *');
+    $allowedOrigins = CORS_ALLOWED_ORIGINS;
+    
+    // Se configurado para aceitar origens específicas
+    if ($allowedOrigins !== '*') {
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        $allowed = array_map('trim', explode(',', $allowedOrigins));
+        if (in_array($origin, $allowed)) {
+            header('Access-Control-Allow-Origin: ' . $origin);
+        }
+    } else {
+        header('Access-Control-Allow-Origin: *');
+    }
+    
     header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization');
     header('Content-Type: application/json; charset=utf-8');

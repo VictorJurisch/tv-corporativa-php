@@ -23,10 +23,13 @@ function sanitizeBase64(string $base64): string {
         $base64 = preg_replace('/^data:image\/[a-z]+;base64,/i', '', $base64);
     }
     
-    // Valida se é um base64 válido
-    if (!preg_match('/^[A-Za-z0-9+\/=]+$/', $base64)) {
+    // Valida se é um base64 válido (suporta standard e URL-safe)
+    if (!preg_match('/^[A-Za-z0-9+\/\-_=]+$/', $base64)) {
         return '';
     }
+    
+    // Converte URL-safe para standard base64
+    $base64 = str_replace(['-', '_'], ['+', '/'], $base64);
     
     return $base64;
 }
