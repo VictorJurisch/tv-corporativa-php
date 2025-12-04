@@ -9,11 +9,11 @@ define('DB_HOST', 'localhost');
 define('DB_NAME', 'u711845530_tv_asti');
 define('DB_USER', 'root');
 define('DB_PASS', '');
-define('DB_CHARSET', 'utf8mb3');
+define('DB_CHARSET', 'utf8');  // ← CORRIGIDO AQUI
 
 // Configurações da Aplicação
 define('APP_NAME', 'TV Corporativa');
-define('APP_VERSION', '1.0.0');
+define('APP_VERSION', '1. 0.0');
 define('APP_TIMEZONE', 'America/Sao_Paulo');
 
 // Configurações de Upload
@@ -24,7 +24,7 @@ define('UPLOAD_ALLOWED_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'image/w
 date_default_timezone_set(APP_TIMEZONE);
 
 // Ambiente (production ou development)
-define('APP_ENV', getenv('APP_ENV') ?: 'production');
+define('APP_ENV', 'development');
 
 // Configurações de erro baseadas no ambiente
 if (APP_ENV === 'development') {
@@ -36,16 +36,15 @@ if (APP_ENV === 'development') {
     ini_set('log_errors', 1);
 }
 
-// Domínios permitidos para CORS (configure conforme necessário)
-define('CORS_ALLOWED_ORIGINS', getenv('CORS_ORIGINS') ?: '*');
+// Domínios permitidos para CORS
+define('CORS_ALLOWED_ORIGINS', '*');
 
 // Headers CORS para API
 function setCorsHeaders() {
     $allowedOrigins = CORS_ALLOWED_ORIGINS;
     
-    // Se configurado para aceitar origens específicas
     if ($allowedOrigins !== '*') {
-        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        $origin = $_SERVER['HTTP_ORIGIN'] ??  '';
         $allowed = array_map('trim', explode(',', $allowedOrigins));
         if (in_array($origin, $allowed)) {
             header('Access-Control-Allow-Origin: ' . $origin);
