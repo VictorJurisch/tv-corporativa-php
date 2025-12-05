@@ -1,7 +1,7 @@
 <?php
 /**
  * Página Principal da TV Corporativa
- * Layout fullscreen responsivo (1920x1080)
+ * Layout fullscreen estilo PowerPoint (1920x1080)
  */
 
 require_once __DIR__ . '/api/config.php';
@@ -59,6 +59,7 @@ $logoBase64 = $config['logo_base64'] ?? '';
             overflow: hidden;
             cursor: none;
             color: var(--text-primary);
+            position: relative;
         }
         
         @keyframes gradientShift {
@@ -69,14 +70,19 @@ $logoBase64 = $config['logo_base64'] ?? '';
         
         /* Header */
         .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 40px;
+            padding: 15px 40px;
             background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--card-border);
-            height: 100px;
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            height: 80px;
+            z-index: 100;
         }
         
         .logo-section {
@@ -86,14 +92,14 @@ $logoBase64 = $config['logo_base64'] ?? '';
         }
         
         .logo {
-            height: 60px;
+            height: 50px;
             width: auto;
-            max-width: 200px;
+            max-width: 180px;
             object-fit: contain;
         }
         
         .logo-placeholder {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 800;
             background: linear-gradient(135deg, var(--accent), #60A5FA);
             -webkit-background-clip: text;
@@ -102,7 +108,7 @@ $logoBase64 = $config['logo_base64'] ?? '';
         }
         
         .company-name {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 600;
             color: var(--text-primary);
         }
@@ -112,7 +118,7 @@ $logoBase64 = $config['logo_base64'] ?? '';
         }
         
         .clock {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: 700;
             color: var(--text-primary);
             font-variant-numeric: tabular-nums;
@@ -120,208 +126,136 @@ $logoBase64 = $config['logo_base64'] ?? '';
         }
         
         .date {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--text-secondary);
-            margin-top: 5px;
+            margin-top: 3px;
         }
         
-        /* Main Content */
+        /* Main Content - Slideshow */
         .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            padding: 30px 40px;
-            height: calc(100vh - 100px - 80px);
-        }
-        
-        .section {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid var(--card-border);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
         }
         
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 25px;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid var(--card-border);
-        }
-        
-        .section-title {
-            font-size: 1.4rem;
-            font-weight: 600;
+        /* Slide */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
         }
         
-        .section-icon {
-            font-size: 1.6rem;
-        }
-        
-        .page-indicators {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .page-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
-        }
-        
-        .page-dot.active {
-            background: var(--accent);
-            transform: scale(1.2);
-        }
-        
-        .section-content {
-            flex: 1;
-            padding: 25px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        /* News Cards */
-        .news-page {
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            right: 25px;
-            bottom: 25px;
-            opacity: 0;
-            transform: translateX(50px);
-            transition: all 0.5s ease;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .news-page.active {
+        .slide.active {
             opacity: 1;
-            transform: translateX(0);
+            z-index: 1;
         }
         
-        .news-card {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            padding: 25px;
-            border: 1px solid var(--card-border);
-            transition: all 0.3s ease;
+        /* Slide de Imagem (Mídia) */
+        .slide-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: transparent;
         }
         
-        .news-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-        }
-        
-        .news-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--text-primary);
-        }
-        
-        .news-description {
-            font-size: 0.9rem;
-            color: var(--accent);
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
-        
-        .news-message {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-        
-        .news-meta {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid var(--card-border);
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-        
-        /* Media Cards */
-        .media-page {
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            right: 25px;
-            bottom: 25px;
-            opacity: 0;
-            transform: scale(0.95);
-            transition: all 0.5s ease;
-        }
-        
-        .media-page.active {
-            opacity: 1;
-            transform: scale(1);
-        }
-        
-        .media-card {
+        /* Slide de Notícia */
+        .slide-news {
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            overflow: hidden;
-            border: 1px solid var(--card-border);
-        }
-        
-        .media-image-container {
-            flex: 1;
-            display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
-        
-        .media-image {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-        
-        .media-info {
-            padding: 20px;
+            padding: 60px 100px;
+            text-align: center;
             background: rgba(0, 0, 0, 0.2);
         }
         
-        .media-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 8px;
+        .news-title-slide {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: var(--text-primary);
+            line-height: 1.3;
+            max-width: 1400px;
         }
         
-        .media-description {
-            font-size: 1rem;
+        .news-description-slide {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+        
+        .news-message-slide {
+            font-size: 2rem;
             color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 1200px;
+        }
+        
+        .news-meta-slide {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 40px;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+        
+        /* Page Indicators */
+        .page-indicators {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+        
+        .page-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .page-dot.active {
+            background: var(--accent);
+            transform: scale(1.3);
+            box-shadow: 0 0 20px var(--accent);
         }
         
         /* Ticker */
         .ticker-container {
-            height: 80px;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid var(--card-border);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             overflow: hidden;
-            position: relative;
+            z-index: 100;
         }
         
         .ticker-label {
@@ -344,8 +278,8 @@ $logoBase64 = $config['logo_base64'] ?? '';
             top: 0;
             bottom: 0;
             border-left: 20px solid var(--accent);
-            border-top: 40px solid transparent;
-            border-bottom: 40px solid transparent;
+            border-top: 35px solid transparent;
+            border-bottom: 35px solid transparent;
         }
         
         .ticker-content {
@@ -390,13 +324,13 @@ $logoBase64 = $config['logo_base64'] ?? '';
         }
         
         .no-content-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
+            font-size: 6rem;
+            margin-bottom: 30px;
             opacity: 0.5;
         }
         
         .no-content-text {
-            font-size: 1.2rem;
+            font-size: 2rem;
         }
         
         /* Animations */
@@ -429,42 +363,16 @@ $logoBase64 = $config['logo_base64'] ?? '';
         </div>
     </header>
     
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- News Section -->
-        <section class="section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="section-icon">📰</span>
-                    Notícias
-                </h2>
-                <div class="page-indicators" id="news-indicators"></div>
-            </div>
-            <div class="section-content" id="news-container">
-                <div class="no-content">
-                    <div class="no-content-icon">📰</div>
-                    <div class="no-content-text">Carregando notícias...</div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Media Section -->
-        <section class="section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="section-icon">🖼️</span>
-                    Mídias
-                </h2>
-                <div class="page-indicators" id="media-indicators"></div>
-            </div>
-            <div class="section-content" id="media-container">
-                <div class="no-content">
-                    <div class="no-content-icon">🖼️</div>
-                    <div class="no-content-text">Carregando mídias...</div>
-                </div>
-            </div>
-        </section>
+    <!-- Main Content - Slideshow -->
+    <main class="main-content" id="slideshow-container">
+        <div class="no-content">
+            <div class="no-content-icon">📺</div>
+            <div class="no-content-text">Carregando conteúdos...</div>
+        </div>
     </main>
+    
+    <!-- Page Indicators -->
+    <div class="page-indicators" id="page-indicators"></div>
     
     <!-- Ticker -->
     <footer class="ticker-container">
@@ -479,15 +387,11 @@ $logoBase64 = $config['logo_base64'] ?? '';
     <script>
         // Configurações
         const ROTATION_INTERVAL = <?php echo (int) $rotationInterval; ?>;
-        const ITEMS_PER_PAGE = 2;
         
         // Estado
-        let newsData = [];
-        let mediaData = [];
-        let currentNewsPage = 0;
-        let currentMediaPage = 0;
-        let newsPages = [];
-        let mediaPages = [];
+        let allSlides = [];
+        let currentSlideIndex = 0;
+        let slideInterval = null;
         
         // Atualiza o relógio
         function updateClock() {
@@ -519,129 +423,139 @@ $logoBase64 = $config['logo_base64'] ?? '';
                 const result = await response.json();
                 
                 if (result.success) {
-                    newsData = result.data.news || [];
-                    mediaData = result.data.media || [];
-                    renderNews();
-                    renderMedia();
-                    updateTicker();
+                    const newsData = result.data.news || [];
+                    const mediaData = result.data.media || [];
+                    
+                    // Combina todos os conteúdos em uma única lista de slides
+                    allSlides = [];
+                    
+                    // Adiciona mídias como slides (apenas imagem, sem título/descrição)
+                    mediaData.forEach(media => {
+                        if (media.image) {
+                            allSlides.push({
+                                type: 'media',
+                                image: media.image,
+                                titulo: media.titulo
+                            });
+                        }
+                    });
+                    
+                    // Adiciona notícias como slides
+                    newsData.forEach(news => {
+                        allSlides.push({
+                            type: 'news',
+                            titulo: news.titulo,
+                            descricao: news.descricao,
+                            mensagem: news.mensagem,
+                            nome_autor: news.nome_autor,
+                            dt_publicacao: news.dt_publicacao
+                        });
+                    });
+                    
+                    renderSlideshow();
+                    updateTicker(newsData);
                 }
             } catch (error) {
                 console.error('Erro ao buscar dados:', error);
             }
         }
         
-        // Divide array em páginas
-        function paginateArray(array, itemsPerPage) {
-            const pages = [];
-            for (let i = 0; i < array.length; i += itemsPerPage) {
-                pages.push(array.slice(i, i + itemsPerPage));
-            }
-            return pages;
-        }
-        
-        // Renderiza indicadores de página
-        function renderIndicators(containerId, totalPages, currentPage) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
+        // Renderiza o slideshow
+        function renderSlideshow() {
+            const container = document.getElementById('slideshow-container');
+            const indicators = document.getElementById('page-indicators');
             
-            for (let i = 0; i < totalPages; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'page-dot' + (i === currentPage ? ' active' : '');
-                container.appendChild(dot);
-            }
-        }
-        
-        // Renderiza notícias
-        function renderNews() {
-            const container = document.getElementById('news-container');
-            
-            if (newsData.length === 0) {
+            if (allSlides.length === 0) {
                 container.innerHTML = `
                     <div class="no-content">
-                        <div class="no-content-icon">📰</div>
-                        <div class="no-content-text">Nenhuma notícia disponível</div>
+                        <div class="no-content-icon">📺</div>
+                        <div class="no-content-text">Nenhum conteúdo disponível</div>
                     </div>
                 `;
+                indicators.innerHTML = '';
                 return;
             }
             
-            newsPages = paginateArray(newsData, ITEMS_PER_PAGE);
             container.innerHTML = '';
+            indicators.innerHTML = '';
             
-            newsPages.forEach((page, pageIndex) => {
-                const pageDiv = document.createElement('div');
-                pageDiv.className = 'news-page' + (pageIndex === 0 ? ' active' : '');
-                pageDiv.id = `news-page-${pageIndex}`;
+            allSlides.forEach((slide, index) => {
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'slide' + (index === 0 ? ' active' : '');
+                slideDiv.id = `slide-${index}`;
                 
-                page.forEach(news => {
-                    const card = document.createElement('div');
-                    card.className = 'news-card';
-                    card.innerHTML = `
-                        <h3 class="news-title">${escapeHtml(news.titulo)}</h3>
-                        <p class="news-description">${escapeHtml(news.descricao)}</p>
-                        <p class="news-message">${escapeHtml(news.mensagem || '')}</p>
-                        <div class="news-meta">
-                            <span>👤 ${escapeHtml(news.nome_autor)}</span>
-                            <span>📅 ${formatDate(news.dt_publicacao)}</span>
+                if (slide.type === 'media') {
+                    // Slide de imagem - fullscreen sem título/descrição
+                    slideDiv.innerHTML = `
+                        <img src="${escapeHtml(slide.image)}" alt="${escapeHtml(slide.titulo)}" class="slide-image">
+                    `;
+                } else {
+                    // Slide de notícia
+                    slideDiv.innerHTML = `
+                        <div class="slide-news">
+                            <h2 class="news-title-slide">${escapeHtml(slide.titulo)}</h2>
+                            <p class="news-description-slide">${escapeHtml(slide.descricao)}</p>
+                            <p class="news-message-slide">${escapeHtml(slide.mensagem || '')}</p>
+                            <div class="news-meta-slide">
+                                <span>👤 ${escapeHtml(slide.nome_autor)}</span>
+                                <span>📅 ${formatDate(slide.dt_publicacao)}</span>
+                            </div>
                         </div>
                     `;
-                    pageDiv.appendChild(card);
-                });
+                }
                 
-                container.appendChild(pageDiv);
+                container.appendChild(slideDiv);
+                
+                // Cria indicador
+                const dot = document.createElement('div');
+                dot.className = 'page-dot' + (index === 0 ? ' active' : '');
+                dot.onclick = () => goToSlide(index);
+                indicators.appendChild(dot);
             });
             
-            renderIndicators('news-indicators', newsPages.length, currentNewsPage);
+            // Inicia rotação automática
+            startSlideRotation();
         }
         
-        // Renderiza mídias
-        function renderMedia() {
-            const container = document.getElementById('media-container');
+        // Vai para um slide específico
+        function goToSlide(index) {
+            if (index === currentSlideIndex) return;
             
-            if (mediaData.length === 0) {
-                container.innerHTML = `
-                    <div class="no-content">
-                        <div class="no-content-icon">🖼️</div>
-                        <div class="no-content-text">Nenhuma mídia disponível</div>
-                    </div>
-                `;
-                return;
-            }
+            const currentSlide = document.getElementById(`slide-${currentSlideIndex}`);
+            const nextSlide = document.getElementById(`slide-${index}`);
             
-            mediaPages = mediaData.map(item => [item]); // Uma mídia por página
-            container.innerHTML = '';
+            if (currentSlide) currentSlide.classList.remove('active');
+            if (nextSlide) nextSlide.classList.add('active');
             
-            mediaPages.forEach((page, pageIndex) => {
-                const media = page[0];
-                const pageDiv = document.createElement('div');
-                pageDiv.className = 'media-page' + (pageIndex === 0 ? ' active' : '');
-                pageDiv.id = `media-page-${pageIndex}`;
-                
-                const imageSrc = media.image || '';
-                
-                pageDiv.innerHTML = `
-                    <div class="media-card">
-                        <div class="media-image-container">
-                            ${imageSrc ? `<img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(media.titulo)}" class="media-image">` : '<div class="no-content-icon">🖼️</div>'}
-                        </div>
-                        <div class="media-info">
-                            <h3 class="media-title">${escapeHtml(media.titulo)}</h3>
-                            <p class="media-description">${escapeHtml(media.descricao)}</p>
-                        </div>
-                    </div>
-                `;
-                
-                container.appendChild(pageDiv);
+            // Atualiza indicadores
+            const dots = document.querySelectorAll('.page-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
             });
             
-            renderIndicators('media-indicators', mediaPages.length, currentMediaPage);
+            currentSlideIndex = index;
+        }
+        
+        // Próximo slide
+        function nextSlide() {
+            if (allSlides.length <= 1) return;
+            const nextIndex = (currentSlideIndex + 1) % allSlides.length;
+            goToSlide(nextIndex);
+        }
+        
+        // Inicia rotação automática
+        function startSlideRotation() {
+            if (slideInterval) clearInterval(slideInterval);
+            if (allSlides.length > 1) {
+                slideInterval = setInterval(nextSlide, ROTATION_INTERVAL);
+            }
         }
         
         // Atualiza ticker
-        function updateTicker() {
+        function updateTicker(newsData) {
             const ticker = document.getElementById('ticker-text');
             
-            if (newsData.length === 0) {
+            if (!newsData || newsData.length === 0) {
                 ticker.textContent = 'Nenhum aviso no momento';
                 return;
             }
@@ -651,34 +565,6 @@ $logoBase64 = $config['logo_base64'] ?? '';
             ).join('<span class="ticker-separator">•</span>');
             
             ticker.innerHTML = tickerItems;
-        }
-        
-        // Rotação de páginas de notícias
-        function rotateNewsPage() {
-            if (newsPages.length <= 1) return;
-            
-            const currentPage = document.getElementById(`news-page-${currentNewsPage}`);
-            currentNewsPage = (currentNewsPage + 1) % newsPages.length;
-            const nextPage = document.getElementById(`news-page-${currentNewsPage}`);
-            
-            if (currentPage) currentPage.classList.remove('active');
-            if (nextPage) nextPage.classList.add('active');
-            
-            renderIndicators('news-indicators', newsPages.length, currentNewsPage);
-        }
-        
-        // Rotação de páginas de mídia
-        function rotateMediaPage() {
-            if (mediaPages.length <= 1) return;
-            
-            const currentPage = document.getElementById(`media-page-${currentMediaPage}`);
-            currentMediaPage = (currentMediaPage + 1) % mediaPages.length;
-            const nextPage = document.getElementById(`media-page-${currentMediaPage}`);
-            
-            if (currentPage) currentPage.classList.remove('active');
-            if (nextPage) nextPage.classList.add('active');
-            
-            renderIndicators('media-indicators', mediaPages.length, currentMediaPage);
         }
         
         // Escape HTML
@@ -711,10 +597,6 @@ $logoBase64 = $config['logo_base64'] ?? '';
             
             // Recarrega dados a cada 5 minutos
             setInterval(fetchData, 300000);
-            
-            // Rotação de páginas
-            setInterval(rotateNewsPage, ROTATION_INTERVAL);
-            setInterval(rotateMediaPage, ROTATION_INTERVAL);
         });
     </script>
 </body>
