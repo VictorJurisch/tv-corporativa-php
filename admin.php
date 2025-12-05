@@ -683,7 +683,8 @@ $themeAccent = $config['theme_accent'] ?? '#3B82F6';
     
     <script>
         // Estado
-        let logoBase64 = '';
+        let logoBase64 = <?php echo json_encode($config['logo_base64'] ?? ''); ?> || '';
+        let currentLogoUrl = <?php echo json_encode($config['logo_url'] ?? ''); ?> || '';
         
         // Switch Tabs
         function switchTab(tabName) {
@@ -744,16 +745,34 @@ $themeAccent = $config['theme_accent'] ?? '#3B82F6';
             const file = event.target.files[0];
             if (!file) return;
             
-            const preview = document.getElementById('logo-preview');
             const reader = new FileReader();
             
             reader.onload = function(e) {
                 logoBase64 = e.target.result;
-                preview.innerHTML = `<img src="${e.target.result}" alt="Logo Preview">`;
-                preview.classList.add('show');
+                renderLogoPreview(logoBase64);
             };
             
             reader.readAsDataURL(file);
+        }
+        
+        function renderLogoPreview(source) {
+            const preview = document.getElementById('logo-preview');
+            if (!preview) return;
+            
+            if (source) {
+                preview.innerHTML = `<img src="${escapeHtml(source)}" alt="Logo Preview">`;
+                preview.classList.add('show');
+            } else {
+                preview.innerHTML = '';
+                preview.classList.remove('show');
+            }
+        }
+        
+        function applyThemeColors(primary, secondary, accent) {
+            const root = document.documentElement;
+            root.style.setProperty('--primary', primary);
+            root.style.setProperty('--secondary', secondary);
+            root.style.setProperty('--accent', accent);
         }
         
         // Fetch Data
@@ -966,27 +985,52 @@ $themeAccent = $config['theme_accent'] ?? '#3B82F6';
             const secondary = document.getElementById('config-secondary').value;
             const accent = document.getElementById('config-accent').value;
             
+            if (!company) {
+                showToast('Informe o nome da empresa', 'error');
+                return;
+            }
+            
             try {
-                // Note: Configuration update would require a separate API endpoint
-                // For now, show a message about manual configuration
-                showToast('Configurações salvas! Recarregue a página da TV.', 'success');
-                
-                // In a full implementation, you would POST to an API:
-                /*
-                const response = await fetch('api/config.php', {
+                const response = await fetch('api/config_save.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         company_name: company,
                         logo_url: logoUrl,
-                        logo_base64: logoBase64,
+                        logo_base64: logoBase64 || '',
                         rotation_interval_seconds: interval,
                         theme_primary: primary,
                         theme_secondary: secondary,
                         theme_accent: accent
                     })
                 });
-                */
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Erro ao salvar configurações');
+                }
+                
+                const data = result.data || {};
+                const updatedConfig = data.config || {};
+                
+                document.getElementById('config-company').value = updatedConfig.company_name || company;
+                document.getElementById('config-logo-url').value = updatedConfig.logo_url || logoUrl;
+                document.getElementById('config-interval').value = updatedConfig.rotation_interval_seconds || interval;
+                document.getElementById('config-primary').value = updatedConfig.theme_primary || primary;
+                document.getElementById('config-secondary').value = updatedConfig.theme_secondary || secondary;
+                document.getElementById('config-accent').value = updatedConfig.theme_accent || accent;
+                
+                logoBase64 = updatedConfig.logo_base64 || '';
+                currentLogoUrl = updatedConfig.logo_url || '';
+                renderLogoPreview(logoBase64 || currentLogoUrl);
+                applyThemeColors(
+                    updatedConfig.theme_primary || primary,
+                    updatedConfig.theme_secondary || secondary,
+                    updatedConfig.theme_accent || accent
+                );
+                
+                showToast(data.message || 'Configurações salvas com sucesso!');
             } catch (error) {
                 showToast(error.message, 'error');
             }
@@ -1015,6 +1059,7 @@ $themeAccent = $config['theme_accent'] ?? '#3B82F6';
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            renderLogoPreview(logoBase64 || currentLogoUrl || document.getElementById('config-logo-url').value.trim());
             fetchData();
         });
     </script>
